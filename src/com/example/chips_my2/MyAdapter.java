@@ -124,11 +124,16 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 								.startsWith(
 										constraint.toString().toUpperCase(
 												Locale.getDefault()))) {
+							Log.d("tag",
+									friend.getName().toUpperCase(
+											Locale.getDefault())
+											+ " true");
 							mFriends.add(friend);
 						}
 					}
 					results.values = mFriends;
 					results.count = mFriends.size();
+					Log.d("tag", "results.count " + results.count);
 				}
 				return results;
 			}
@@ -137,12 +142,8 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 			@Override
 			protected void publishResults(CharSequence constraint,
 					FilterResults results) {
-				if (results.count == 0)
-					notifyDataSetInvalidated();
-				else {
-					friends = (ArrayList<Friend>) results.values;
-					notifyDataSetChanged();
-				}
+				friends = (ArrayList<Friend>) results.values;
+				notifyDataSetChanged();
 			}
 		};
 	}

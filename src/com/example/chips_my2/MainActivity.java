@@ -33,7 +33,10 @@ public class MainActivity extends Activity {
 
 		editText = (MyAutoCompleteTextView) findViewById(R.id.editText1);
 
-		myAdapter = new MyAdapter(this);
+		if (myAdapter == null) {
+			Log.d("tag", "new adapter onCreate");
+			myAdapter = new MyAdapter(this);
+		}
 		listview = (ListView) findViewById(R.id.listView1);
 		listview.setAdapter(myAdapter);
 		listview.setOnItemClickListener(new OnItemClickListener() {
@@ -43,10 +46,11 @@ public class MainActivity extends Activity {
 				myAdapter.checkItem(position);
 				editText.setItem((Friend) myAdapter.getItem(position));
 				myAdapter.notifyDataSetChanged();
-				
+
 			}
 		});
 	}
+
 
 	@Override
 	public void onResume() {
