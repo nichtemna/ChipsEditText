@@ -1,5 +1,10 @@
 package com.example.chips_my2;
 
+import com.example.chips_my2.actions.ActionManager;
+import com.example.chips_my2.actions.MyAction;
+import com.example.chips_my2.model.Friend;
+import com.example.chips_my2.view.MyAutoCompleteTextView;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;

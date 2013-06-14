@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
+import com.example.chips_my2.model.Friend;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -124,10 +126,6 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 								.startsWith(
 										constraint.toString().toUpperCase(
 												Locale.getDefault()))) {
-							Log.d("tag",
-									friend.getName().toUpperCase(
-											Locale.getDefault())
-											+ " true");
 							mFriends.add(friend);
 						}
 					}

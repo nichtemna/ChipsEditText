@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity" >
 
-    <com.example.chips_my2.MyAutoCompleteTextView
+    <com.example.chips_my2.view.MyAutoCompleteTextView
         android:id="@+id/editText1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:textColor="@android:color/black" >
 
         <requestFocus />
-    </com.example.chips_my2.MyAutoCompleteTextView>
+    </com.example.chips_my2.view.MyAutoCompleteTextView>
 
     <ListView
         android:id="@+id/listView1"
