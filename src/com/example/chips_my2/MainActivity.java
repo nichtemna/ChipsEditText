@@ -1,12 +1,10 @@
 package com.example.chips_my2;
 
-import com.example.chips_my2.actions.ActionManager;
-import com.example.chips_my2.actions.MyAction;
-import com.example.chips_my2.model.Friend;
-import com.example.chips_my2.view.MyAutoCompleteTextView;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -15,7 +13,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.example.chips_my2.actions.ActionManager;
+import com.example.chips_my2.actions.MyAction;
+import com.example.chips_my2.model.Friend;
+import com.example.chips_my2.view.MyAutoCompleteTextView;
 
 public class MainActivity extends Activity {
 	public static final String UNCKECK_ITEM_ACTION = "com.example.chips.main.uncheckitem";
@@ -39,7 +43,6 @@ public class MainActivity extends Activity {
 		editText = (MyAutoCompleteTextView) findViewById(R.id.editText1);
 
 		if (myAdapter == null) {
-			Log.d("tag", "new adapter onCreate");
 			myAdapter = new MyAdapter(this);
 		}
 		listview = (ListView) findViewById(R.id.listView1);
@@ -48,14 +51,39 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				myAdapter.checkItem(position);
-				editText.setItem((Friend) myAdapter.getItem(position));
-				myAdapter.notifyDataSetChanged();
-
+				if (((Friend) myAdapter.getItem(position)).getArrayOfEmails()
+						.size() > 1
+						&& !((Friend) myAdapter.getItem(position)).isChecked()) {
+					showChooseEmailDialog(position);
+				} else {
+					checkItem(position);
+				}
 			}
 		});
 	}
 
+	private void checkItem(int position) {
+		myAdapter.checkItem(position);
+		editText.setItem((Friend) myAdapter.getItem(position));
+		myAdapter.notifyDataSetChanged();
+	}
+
+	private void showChooseEmailDialog(final int position) {
+		final Friend friend = (Friend) myAdapter.getItem(position);
+		AlertDialog.Builder adb = new AlertDialog.Builder(this);
+		adb.setTitle("Choose one email");
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.select_dialog_item, friend.getArrayOfEmails());
+		adb.setAdapter(adapter, new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				checkItem(position);
+				myAdapter.setChosenEmail(friend,
+						friend.getArrayOfEmails().get(which));
+			}
+		});
+		AlertDialog dialog = adb.create();
+		dialog.show();
+	}
 
 	@Override
 	public void onResume() {
@@ -97,7 +125,6 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String s = intent.getStringExtra(FILTER_TEXT);
-			// Log.d("tag", "onReceive " + s);
 			myAdapter.getFilter().filter(s);
 		}
 

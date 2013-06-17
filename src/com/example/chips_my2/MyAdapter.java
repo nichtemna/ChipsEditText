@@ -1,11 +1,11 @@
 package com.example.chips_my2;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import com.example.chips_my2.model.Friend;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -24,6 +24,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import com.example.chips_my2.model.Friend;
+
 public class MyAdapter extends BaseAdapter implements Filterable {
 	private Context mContext;
 	private ArrayList<Friend> friends = new ArrayList<Friend>();
@@ -31,16 +33,13 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 	private GetDataAsyncTask getDataTask;
 
 	public MyAdapter(Context context) {
-		Log.d("tag", "MyAdapter");
 		getDataTask = new GetDataAsyncTask();
 		this.mContext = context;
 		try {
 			this.friends = getDataTask.execute().get();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.friends_data = friends;
@@ -61,10 +60,47 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 		return pos;
 	}
 
+	public ArrayList<Friend> getFriendsList() {
+		return friends;
+	}
+
 	public void checkItem(int pos) {
 		boolean checked = friends.get(pos).isChecked();
 		friends.get(pos).setChecked(checked ? false : true);
 		friends_data.get(pos).setChecked(checked ? false : true);
+	}
+
+	public void setChosenEmail(Friend friend, String chosen_email) {
+		for (Friend one_friend : friends) {
+			if (one_friend.equals(friend)) {
+				Iterator<Map.Entry<String, Boolean>> iterator = one_friend
+						.getEmail().entrySet().iterator();
+				while (iterator.hasNext()) {
+					Map.Entry<String, Boolean> mapEntry = (Map.Entry<String, Boolean>) iterator
+							.next();
+					if (mapEntry.getKey().equals(chosen_email)) {
+						one_friend.addEmail(mapEntry.getKey(), true);
+					} else {
+						one_friend.addEmail(mapEntry.getKey(), false);
+					}
+				}
+			}
+		}
+		for (Friend one_friend : friends_data) {
+			if (one_friend.equals(friend)) {
+				Iterator<Map.Entry<String, Boolean>> iterator = one_friend
+						.getEmail().entrySet().iterator();
+				while (iterator.hasNext()) {
+					Map.Entry<String, Boolean> mapEntry = (Map.Entry<String, Boolean>) iterator
+							.next();
+					if (mapEntry.getKey().equals(chosen_email)) {
+						one_friend.addEmail(mapEntry.getKey(), true);
+					} else {
+						one_friend.addEmail(mapEntry.getKey(), false);
+					}
+				}
+			}
+		}
 	}
 
 	public void checkItem(Friend friend, boolean checked) {
@@ -131,7 +167,6 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 					}
 					results.values = mFriends;
 					results.count = mFriends.size();
-					Log.d("tag", "results.count " + results.count);
 				}
 				return results;
 			}
@@ -151,7 +186,6 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 
 		@Override
 		protected void onPreExecute() {
-			Log.d("tag", "onPreExecute");
 			super.onPreExecute();
 			dialog = ProgressDialog.show(mContext, "", "Загрузка...", true);
 		}
@@ -159,14 +193,15 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 		@Override
 		protected ArrayList<Friend> doInBackground(Void... params) {
 			ArrayList<Friend> friends = new ArrayList<Friend>();
-			ContentResolver cr = mContext.getContentResolver();
-			Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
-					null, null, null);
+			ContentResolver contentResolver = mContext.getContentResolver();
+			Cursor cur = contentResolver.query(
+					ContactsContract.Contacts.CONTENT_URI, null, null, null,
+					null);
 			if (cur.getCount() > 0) {
 				while (cur.moveToNext()) {
 					String id = cur.getString(cur
 							.getColumnIndex(ContactsContract.Contacts._ID));
-					Cursor cur1 = cr.query(
+					Cursor cur1 = contentResolver.query(
 							ContactsContract.CommonDataKinds.Email.CONTENT_URI,
 							null,
 							ContactsContract.CommonDataKinds.Email.CONTACT_ID
@@ -180,11 +215,11 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 								.getString(cur1
 										.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
 						if (email != null && email.length() != 0) {
-							Friend newFriend = new Friend(name, email, false);
+							Friend newFriend = new Friend(name, email);
 							if (friends.contains(newFriend)) {
 								for (Friend friend : friends) {
 									if (friend.equals(newFriend)) {
-										friend.addEmail(email);
+										friend.addEmail(email, false);
 										break;
 									}
 								}
@@ -201,9 +236,9 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 
 		@Override
 		protected void onPostExecute(ArrayList<Friend> result) {
-			Log.d("tag", "onPostExecute");
 			super.onPostExecute(result);
 			dialog.dismiss();
 		}
 	}
+
 }

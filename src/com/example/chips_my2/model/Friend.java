@@ -2,32 +2,31 @@ package com.example.chips_my2.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Friend implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private boolean facebook;
 	private String name;
-	private ArrayList<String> emails;
+	private HashMap<String, Boolean> emails;
 	private boolean checked = false;
-
-	public boolean isChecked() {
-		return checked;
-	}
-
-	public void setChecked(boolean checked) {
-		this.checked = checked;
-	}
 
 	public Friend() {
 		super();
 	}
 
-	public Friend(String name, String email, boolean facebook) {
+	public Friend(String name, String email) {
 		super();
 		this.name = name;
-		this.emails = new ArrayList<String>();
-		this.emails.add(email);
-		this.facebook = facebook;
+		this.emails = new HashMap<String, Boolean>();
+		this.emails.put(email, false);
+	}
+
+	public ArrayList<String> getArrayOfEmails() {
+		ArrayList<String> array = new ArrayList<String>();
+		for (String string : emails.keySet()) {
+			array.add(string);
+		}
+		return array;
 	}
 
 	@Override
@@ -63,23 +62,23 @@ public class Friend implements Serializable {
 		this.name = name;
 	}
 
-	public ArrayList<String> getEmail() {
+	public HashMap<String, Boolean> getEmail() {
 		return emails;
 	}
 
-	public void setEmail(ArrayList<String> emails) {
+	public void setEmail(HashMap<String, Boolean> emails) {
 		this.emails = emails;
 	}
 
-	public void addEmail(String email) {
-		this.emails.add(email);
+	public void addEmail(String email, boolean chosen) {
+		this.emails.put(email, chosen);
 	}
 
-	public boolean isFacebook() {
-		return facebook;
+	public boolean isChecked() {
+		return checked;
 	}
 
-	public void setFacebook(boolean facebook) {
-		this.facebook = facebook;
+	public void setChecked(boolean checked) {
+		this.checked = checked;
 	}
 }
