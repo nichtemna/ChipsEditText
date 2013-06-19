@@ -2,23 +2,29 @@ package com.example.chips_my2.view;
 
 import java.util.ArrayList;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
 
 import com.example.chips_my2.MainActivity;
 import com.example.chips_my2.model.Friend;
 import com.example.chips_my2.view.FriendsClickSpan.OnChangeSpanListener;
-
-;
 
 public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		OnChangeSpanListener {
@@ -46,6 +52,32 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		this.mContext = context;
 		addTextChangedListener(textWather);
 		setMovementMethod(LinkMovementMethod.getInstance());
+
+		/*
+		 * on touch we detect cursor position, if cursor at the end - show
+		 * keyboard and cursorif cursor not at the end - we hide keyboard and
+		 * cursor
+		 */
+		setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				long offset = -1;
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_UP:
+					Layout layout = ((EditText) v).getLayout();
+					float x = event.getX() + getScrollX();
+					float y = event.getY() + getScrollY();
+					int line = layout.getLineForVertical((int) y);
+					offset = layout.getOffsetForHorizontal(line, x);
+					if (offset < getText().length()) {
+						sendActionHideKeyboard();
+					} else {
+						setCursorVisible(true);
+					}
+				}
+				return false;
+			}
+		});
 	}
 
 	/*
@@ -56,13 +88,14 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 	public boolean dispatchKeyEvent(KeyEvent event) {
 		if (event.getKeyCode() == KeyEvent.KEYCODE_DEL
 				&& event.getAction() == KeyEvent.ACTION_DOWN) {
-			if (getAllSpanText().length() < getText().length()
-					|| getText().length() == 0) {
+			if (getAllSpanText().length() + 1 < getText().length()) {
 				return super.dispatchKeyEvent(event);
-			} else {
+			} else if (getText().length() > 1) {
 				removeFriend(friends.get(friends.size() - 1));
-				setText(getTextString());
+				setText(getAllSpanText());
 				setChips();
+				return false;
+			} else if (getText().length() <= 1) {
 				return false;
 			}
 		}
@@ -81,6 +114,11 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
 	}
 
+	public void sendActionHideKeyboard() {
+		Intent intent = new Intent(MainActivity.HIDE_KEYBOARD_ACTION);
+		LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+	}
+
 	/*
 	 * method to know if added symbol
 	 */
@@ -89,7 +127,8 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		for (Friend friend : friends) {
 			spanSize += friend.getName().length();
 		}
-		return s.length() >= spanSize;
+		Log.d("tag", " isSymbol " + (s.length() - 1 >= spanSize));
+		return s.length() - 1 >= spanSize;
 	}
 
 	private String getAllSpanText() {
@@ -106,9 +145,12 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
 			if (isSymbol(s.toString())) {
+				/*
+				 * we have one space at the end of the all spans, so when we
+				 * filter list we take text without this space
+				 */
 				String search = s.toString().substring(
-						getAllSpanText().length());
-
+						getAllSpanText().length() + 1);
 				sendActionFilterItem(search);
 			}
 		}
@@ -139,7 +181,7 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		} else {
 			removeFriend(friend);
 		}
-		setText(getTextString());
+		setText(getAllSpanText());
 		setChips();
 	}
 
@@ -173,7 +215,8 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 	 * set chips to edittext from list of drawable span and clickable span
 	 */
 	public void setChips() {
-		SpannableStringBuilder ssb = new SpannableStringBuilder(getTextString());
+		SpannableStringBuilder ssb = new SpannableStringBuilder(
+				getAllSpanText());
 		int x = 0;
 		for (Friend friend : friends) {
 			ssb.setSpan(getClickSpan(friend), x, x + friend.getName().length(),
@@ -185,6 +228,11 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 
 			x = x + friend.getName().length();
 		}
+		/*
+		 * append one space, so on touch of edittext the last span do not get
+		 * clicked
+		 */
+		ssb.append(" ");
 		setText(ssb);
 		setSelection(getText().length());
 	}
@@ -197,14 +245,6 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 			}
 		}
 		return rez;
-	}
-
-	private String getTextString() {
-		StringBuilder sb = new StringBuilder();
-		for (Friend friend : friends) {
-			sb.append(friend.getName());
-		}
-		return sb.toString();
 	}
 
 	@Override
@@ -223,15 +263,12 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 
 	@Override
 	public void onChangeSpan(Friend friend) {
-		// Log.d("tag", "onChangeSpan");
 		setOnlyOneSpanRemoving(friend);
 		setChips();
-
 	}
 
 	@Override
 	public void removeSpan(Friend friend) {
-		// Log.d("tag", "removeSpan");
 		removeFriend(friend);
 		setChips();
 	}

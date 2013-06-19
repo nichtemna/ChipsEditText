@@ -6,6 +6,7 @@ import com.example.chips_my2.R.layout;
 import com.example.chips_my2.model.Friend;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -73,6 +75,7 @@ public class FriendsClickSpan extends ClickableSpan {
 
 	@Override
 	public void onClick(View view) {
+		Log.d("tag", "onclick " + friend.getName());
 		if (readyToDelete) {
 			listener.removeSpan(friend);
 		} else {

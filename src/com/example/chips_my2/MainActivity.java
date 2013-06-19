@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -24,6 +26,7 @@ import com.example.chips_my2.view.MyAutoCompleteTextView;
 public class MainActivity extends Activity {
 	public static final String UNCKECK_ITEM_ACTION = "com.example.chips.main.uncheckitem";
 	public static final String FILTER_ITEM_ACTION = "com.example.chips.main.filteritem";
+	public static final String HIDE_KEYBOARD_ACTION = "com.example.chips.main.hidekeyboard";
 	public static final String FRIEND = "friend";
 	public static final String FILTER_TEXT = "filter_text";
 	private ListView listview;
@@ -31,20 +34,33 @@ public class MainActivity extends Activity {
 	private MyAdapter myAdapter;
 	private UncheckItemAction unckeckItemAction;
 	private FilterItemAction filterItemAction;
+	private HideKeyboardAction hideKeyboardAction;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d("tag", "MainActivity");
 		setContentView(R.layout.activity_main);
 		filterItemAction = new FilterItemAction();
 		unckeckItemAction = new UncheckItemAction();
+		hideKeyboardAction = new HideKeyboardAction();
 
 		editText = (MyAutoCompleteTextView) findViewById(R.id.editText1);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		ActionManager.registrateAction(this, null, unckeckItemAction);
+		ActionManager.registrateAction(this, null, filterItemAction);
+		ActionManager.registrateAction(this, null, hideKeyboardAction);
 
 		if (myAdapter == null) {
 			myAdapter = new MyAdapter(this);
 		}
+		// else {
+		// Log.d("tag", " myAdapter not null ");
+		// myAdapter.getFriendsList();
+		// }
 		listview = (ListView) findViewById(R.id.listView1);
 		listview.setAdapter(myAdapter);
 		listview.setOnItemClickListener(new OnItemClickListener() {
@@ -61,6 +77,28 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		ActionManager.unregistrateAction(this, unckeckItemAction);
+		ActionManager.unregistrateAction(this, filterItemAction);
+		ActionManager.unregistrateAction(this, hideKeyboardAction);
+	}
+
+	// protected void onSaveInstanceState(Bundle bundle) {
+	// Log.d("tag", " onsave ");
+	// super.onSaveInstanceState(bundle);
+	// bundle.putSerializable(FRIEND, myAdapter.getFriendsList());
+	// }
+	//
+	// protected void onRestoreInstanceState(Bundle savedInstanceState) {
+	// super.onRestoreInstanceState(savedInstanceState);
+	// Log.d("tag", " onrestore ");
+	// ArrayList<Friend> friends = (ArrayList<Friend>) savedInstanceState
+	// .getSerializable(FRIEND);
+	// myAdapter = new MyAdapter(this, friends);
+	// }
 
 	private void checkItem(int position) {
 		myAdapter.checkItem(position);
@@ -83,20 +121,6 @@ public class MainActivity extends Activity {
 		});
 		AlertDialog dialog = adb.create();
 		dialog.show();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		ActionManager.registrateAction(this, null, unckeckItemAction);
-		ActionManager.registrateAction(this, null, filterItemAction);
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		ActionManager.unregistrateAction(this, unckeckItemAction);
-		ActionManager.unregistrateAction(this, filterItemAction);
 	}
 
 	class UncheckItemAction extends MyAction {
@@ -140,4 +164,25 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	class HideKeyboardAction extends MyAction {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d("tag", "onRecieve hide");
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+			editText.setCursorVisible(false);
+		}
+
+		@Override
+		protected void onRegistrate(Activity activity, Fragment fragment) {
+			super.onRegistrate(activity, fragment);
+		}
+
+		@Override
+		protected IntentFilter init() {
+			IntentFilter intentFilter = new IntentFilter(HIDE_KEYBOARD_ACTION);
+			return intentFilter;
+		}
+	}
 }

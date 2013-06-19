@@ -18,7 +18,7 @@ public class Friend implements Serializable {
 		super();
 		this.name = name;
 		this.emails = new HashMap<String, Boolean>();
-		this.emails.put(email, false);
+		this.emails.put(email, true);
 	}
 
 	public ArrayList<String> getArrayOfEmails() {

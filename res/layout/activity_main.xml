@@ -11,11 +11,11 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:ems="10"
-        android:inputType="textMultiLine"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:inputType="textMultiLine|none"
         android:lineSpacingExtra="5dip"
         android:textColor="#000000" >
-
-        <requestFocus />
     </com.example.chips_my2.view.MyAutoCompleteTextView>
 
     <ListView

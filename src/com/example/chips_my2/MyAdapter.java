@@ -45,6 +45,12 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 		this.friends_data = friends;
 	}
 
+	public MyAdapter(Context context, ArrayList<Friend> friends) {
+		this.mContext = context;
+		this.friends = friends;
+		this.friends_data = friends;
+	}
+
 	@Override
 	public int getCount() {
 		return friends.size();
@@ -60,16 +66,39 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 		return pos;
 	}
 
+	/*
+	 * return current friend list
+	 */
 	public ArrayList<Friend> getFriendsList() {
+		for (Friend one_friend : friends) {
+			Iterator<Map.Entry<String, Boolean>> iterator = one_friend
+					.getEmail().entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<String, Boolean> mapEntry = (Map.Entry<String, Boolean>) iterator
+						.next();
+				Log.d("tag",
+						one_friend.getName() + " " + one_friend.isChecked()
+								+ " " + mapEntry.getKey() + " "
+								+ mapEntry.getValue());
+			}
+		}
 		return friends;
 	}
 
+	/*
+	 * check or uncheck user in both lists
+	 */
 	public void checkItem(int pos) {
 		boolean checked = friends.get(pos).isChecked();
 		friends.get(pos).setChecked(checked ? false : true);
 		friends_data.get(pos).setChecked(checked ? false : true);
 	}
 
+	
+	/*
+	 * if user has few emails we mark chosen as true, other as false
+	 * if user has only one email it's always true
+	 */
 	public void setChosenEmail(Friend friend, String chosen_email) {
 		for (Friend one_friend : friends) {
 			if (one_friend.equals(friend)) {
@@ -103,6 +132,9 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 		}
 	}
 
+	/*
+	 * mark user as checked or unchecked
+	 */
 	public void checkItem(Friend friend, boolean checked) {
 		for (Friend one_friend : friends) {
 			if (one_friend.equals(friend)) {
@@ -181,6 +213,9 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 		};
 	}
 
+	/*
+	 * get data about user's contacts
+	 */
 	class GetDataAsyncTask extends AsyncTask<Void, Void, ArrayList<Friend>> {
 		ProgressDialog dialog;
 
@@ -219,7 +254,7 @@ public class MyAdapter extends BaseAdapter implements Filterable {
 							if (friends.contains(newFriend)) {
 								for (Friend friend : friends) {
 									if (friend.equals(newFriend)) {
-										friend.addEmail(email, false);
+										friend.addEmail(email, true);
 										break;
 									}
 								}
