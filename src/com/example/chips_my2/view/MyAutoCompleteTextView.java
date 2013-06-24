@@ -127,7 +127,6 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		for (Friend friend : friends) {
 			spanSize += friend.getName().length();
 		}
-		Log.d("tag", " isSymbol " + (s.length() - 1 >= spanSize));
 		return s.length() - 1 >= spanSize;
 	}
 
@@ -261,12 +260,19 @@ public class MyAutoCompleteTextView extends MultiAutoCompleteTextView implements
 		super.onSelectionChanged(start, end);
 	}
 
+	/*
+	 * first tap on span, set span ready to delete - change icon of this one to
+	 * deleting and all other to usual
+	 */
 	@Override
 	public void onChangeSpan(Friend friend) {
 		setOnlyOneSpanRemoving(friend);
 		setChips();
 	}
 
+	/*
+	 * second tap on span
+	 */
 	@Override
 	public void removeSpan(Friend friend) {
 		removeFriend(friend);

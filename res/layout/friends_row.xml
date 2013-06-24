@@ -20,7 +20,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dip"
         android:layout_toRightOf="@id/friend_row_image"
-        android:text="Friend" />
+        android:textSize="@dimen/text_in_friend_row" />
 
     <CheckBox
         android:id="@+id/checkBox1"

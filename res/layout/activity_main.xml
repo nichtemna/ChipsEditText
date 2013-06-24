@@ -13,7 +13,7 @@
         android:ems="10"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:inputType="textMultiLine|none"
+        android:inputType="textMultiLine"
         android:lineSpacingExtra="5dip"
         android:textColor="#000000" >
     </com.example.chips_my2.view.MyAutoCompleteTextView>

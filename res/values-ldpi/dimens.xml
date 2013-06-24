@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-      <dimen name="text">18sp</dimen>
+
+    <dimen name="text_in_friend_row">13sp</dimen>
+    <dimen name="text_in_friend_span">20sp</dimen>
+
 </resources>

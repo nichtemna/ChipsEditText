@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -57,10 +55,6 @@ public class MainActivity extends Activity {
 		if (myAdapter == null) {
 			myAdapter = new MyAdapter(this);
 		}
-		// else {
-		// Log.d("tag", " myAdapter not null ");
-		// myAdapter.getFriendsList();
-		// }
 		listview = (ListView) findViewById(R.id.listView1);
 		listview.setAdapter(myAdapter);
 		listview.setOnItemClickListener(new OnItemClickListener() {
@@ -168,7 +162,6 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d("tag", "onRecieve hide");
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 			editText.setCursorVisible(false);

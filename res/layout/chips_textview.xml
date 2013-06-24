@@ -10,5 +10,5 @@
     android:shadowDy="1"
     android:shadowRadius="0.01"
     android:textColor="#000000"
-    android:textSize="@dimen/text"
+    android:textSize="@dimen/text_in_friend_span"
     android:textStyle="bold" />

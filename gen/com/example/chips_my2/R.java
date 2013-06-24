@@ -19,7 +19,8 @@ public final class R {
          */
         public static final int activity_horizontal_margin=0x7f040000;
         public static final int activity_vertical_margin=0x7f040001;
-        public static final int text=0x7f040002;
+        public static final int text_in_friend_row=0x7f040002;
+        public static final int text_in_friend_span=0x7f040003;
     }
     public static final class drawable {
         public static final int delete=0x7f020000;
