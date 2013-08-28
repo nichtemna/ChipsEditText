@@ -6,5 +6,4 @@ On listview item tap, adding span with friend name to Edittext, this span is cli
 If span removed from Edittext, also it's unchecking in ListView. 
 Also possible typeng text after spans, and the ListView will be filtered by this text.
 
-Screenshot of this widget - https://github.com/nichtemna/MyChipsEditText/blob/master/additional/2013-06-24%2011.41.11.png
-This widget currently used in mobile client for http://www.getperx.com/
+![ScreenShot](https://raw.github.com/nichtemna/ChipsEditText/master/additional/2013-06-24%2011.41.11.png)
